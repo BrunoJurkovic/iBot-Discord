@@ -13,3 +13,4 @@ private_token = read_file()
 
 client = discord.Client()
 client.run(private_token)
+#Yes
