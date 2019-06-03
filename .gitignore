@@ -24,6 +24,9 @@ token
 .idea/**/uiDesigner.xml
 .idea/**/dbnavigator.xml
 
+# The statistics file
+statistics.txt
+
 # Gradle
 .idea/**/gradle.xml
 .idea/**/libraries
