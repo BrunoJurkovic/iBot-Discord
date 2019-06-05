@@ -1,2 +1,0 @@
-# iBot-Discord
-placeholder 
