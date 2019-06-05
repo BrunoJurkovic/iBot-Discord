@@ -15,14 +15,23 @@ def read_file():
     return variable
 
 #This will load the desired cogs
-@client.command
+@client.command()
 async def load(ctx, extension):
-    client.load_extension(f'''cogs.{extension}''')
+    try:
+        client.load_extension(f'''cogs.{extension}''')
+        await ctx.channel.send(f'''Successfully loaded {extension}''')
+    except Exception as e:
+        await ctx.channel.send(f'''Error! We could not load the extension {extension} because {e}''')
 
 #This unloads the desired cogs
-@client.command
+@client.command()
 async def unload(ctx, extension):
-    client.unload_extension(f'''cogs.{extension}''')
+    try:
+        client.unload_extension(f'''cogs.{extension}''')
+        await ctx.channel.send(f'''Successfully unloaded {extension}''')
+
+    except Exception as e:
+        await ctx.channel.send(f'''Error! We could not unload the extension {extension} because {e}''')
 
 # This checks every file in the cogs folder, and loads it
 for file in os.listdir('./cogs'):
