@@ -12,6 +12,10 @@
 token
 .idea
 
+# We ignore the users .json aswell
+users.json
+
+
 # Generated files
 .idea/**/contentModel.xml
 
