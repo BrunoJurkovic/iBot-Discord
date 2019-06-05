@@ -33,6 +33,7 @@ async def unload(ctx, extension):
     except Exception as e:
         await ctx.channel.send(f'''Error! We could not unload the extension {extension} because {e}''')
 
+
 # This checks every file in the cogs folder, and loads it
 for file in os.listdir('./cogs'):
     if file.endswith('.py'):
