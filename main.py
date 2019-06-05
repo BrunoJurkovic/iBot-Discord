@@ -33,6 +33,25 @@ async def unload(ctx, extension):
     except Exception as e:
         await ctx.channel.send(f'''Error! We could not unload the extension {extension} because {e}''')
 
+@client.command()
+async def reload(ctx, extension):
+    if extension == 'all':
+        try:
+            for file in os.listdir('./cogs'):
+                if file.endswith('.py'):
+                    client.reload_extension(f"""cogs.{file[:-3]}""")
+            await ctx.channel.send(f'''Successfully reloaded all cogs!''')
+
+
+        except Exception as e:
+            await ctx.channel.send(f'''Error! We could not reload all cogs because "{e}"''')
+    else:
+        try:
+            client.reload_extension(f'''cogs.{extension}''')
+            await ctx.channel.send(f'''Successfully reloaded {extension}.''')
+
+        except Exception as e:
+            await ctx.channel.send(f'''Error! We could not reload the extension {extension} because "{e}"''')
 
 # This checks every file in the cogs folder, and loads it
 for file in os.listdir('./cogs'):

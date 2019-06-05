@@ -21,7 +21,7 @@ class Moderation(commands.Cog):
     #TODO: Add unban
 
     @commands.command()
-    async def ping(self, ctx):
+    async def ping(self, ctx): # TODO: Fix the ping system
         await ctx.channel.send(f'''The ping is `{round(self.client.latency * 1000)}` ms!''')
 
 
