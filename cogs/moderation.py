@@ -29,18 +29,13 @@ class Moderation(commands.Cog):
             await ctx.channel.send(f'''The user {member} could not be banned. ''')
 
     #TODO: Add unban
+    #TODO Add checks
 
     @commands.command()
-    async def ping(self, ctx): # ik it's bad code
-        sent_time = ctx.message.created_at
-        sec_time = (sent_time-datetime.datetime(1970,1,1)).total_seconds()
-        current_time = time.time()
+    async def clear(self, ctx, limit):
+        await ctx.channel.purge(limit=int(limit) + 1)
+        await ctx.channel.send(f'''The last {limit} of messages have been cleared successfully!''')
 
-        # print(f'''{current_time} CURRENT TIME AFTER MSG''')
-        # print(f'''{sec_time} TIME MESSAGE SENT''')
-
-        final_time = current_time - sec_time
-        await ctx.channel.send(f'''Ping is: `{trunc(final_time * 1000)}`ms''')
 
 def setup(client):
     client.add_cog(Moderation(client))
