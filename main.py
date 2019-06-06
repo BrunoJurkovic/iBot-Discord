@@ -7,6 +7,7 @@ from discord.ext import commands
 
 client = commands.Bot(command_prefix=".")
 
+logging_channel = ''
 # This is the part of the code which reads the users token from a file names token.
 def read_file():
     with open('token') as f:
@@ -41,7 +42,6 @@ async def reload(ctx, extension):
                 if file.endswith('.py'):
                     client.reload_extension(f"""cogs.{file[:-3]}""")
             await ctx.channel.send(f'''Successfully reloaded all cogs!''')
-
 
         except Exception as e:
             await ctx.channel.send(f'''Error! We could not reload all cogs because "{e}"''')
