@@ -21,18 +21,19 @@ class Moderation(commands.Cog):
         await ctx.channel.send(f'''Successfully banned {member.display_name} for the reason: {reason} ''')
 
     #TODO: Add unban
+    # async def unban(self, ctx, user, *,  reason=None): BRUNO IDK HOW TO DO IT CURRENTLY
 
     @commands.command()
     async def ping(self, ctx): # ik it's bad code
-        sent_time = ctx.message.created_at
-        sec_time = (sent_time-datetime.datetime(1970,1,1)).total_seconds()
-        current_time = time.time()
+        current_time = time.perf_counter()
+        await ctx.channel.send("")
+        time_after = time.perf_counter()
 
-        # print(f'''{current_time} CURRENT TIME AFTER MSG''')
-        # print(f'''{sec_time} TIME MESSAGE SENT''')
+        await ctx.channel.purge(limit=1)
 
-        final_time = current_time - sec_time
-        await ctx.channel.send(f'''Ping is: `{trunc(final_time * 1000)}`ms''')
+        final_time = time_after - current_time
+
+        await ctx.channel.send(f'''Latancy is: `{round(final_time * 1000)}`ms''')
 
 def setup(client):
     client.add_cog(Moderation(client))
