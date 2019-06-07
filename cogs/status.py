@@ -8,10 +8,11 @@ class Status(commands.Cog):
         self.client = client
 
 
-    game = cycle(['with the API', 'with scissors'])
+    status = cycle(['with the API', 'with scissors', 'with blocks'])
     @tasks.loop(seconds=10)
-    async def change_status(self, client, status= game):
-        client.change_presence(activity=discord.Game(next(status)))
+    async def change_status(self):
+        await self.client.change_presence(activity=discord.Game(next(self.status)))
+
 
     @commands.Cog.listener()
     async def on_ready(self):
