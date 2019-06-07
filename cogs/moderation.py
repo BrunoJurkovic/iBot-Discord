@@ -62,6 +62,14 @@ class Moderation(commands.Cog):
         except Exception as e:
             await ctx.channel.send(f'''The user {member} could not be banned. ''')
 
+        log_channel = 422534466334883850
+        em = discord.Embed(color=discord.Color.dark_purple())
+        em.set_footer().timestamp = datetime.datetime.utcnow()
+        em.add_field(name='Ban',
+                     value=f'**User**: {member} [{member.id}]\n**Reason**: {reason}\n**Punisher**: {ctx.message.author}')
+        await self.client.get_channel(int(log_channel)).send(embed=em)
+        # await self.punish("Ban", member, ctx.message.author, reason, 0) -- This is for when I will add the database
+
     @commands.command()
     async def unban(self, ctx, *, member):
         banned_list = await ctx.guild.bans()
@@ -73,6 +81,18 @@ class Moderation(commands.Cog):
                 await ctx.guild.unban(user)
                 await ctx.channel.send(f'''Successfully unbanned @{user.name}#{user.discriminator}!''')
                 return
+
+        try:
+            await ctx.member.send(f'''You have been unbanned from the server!''')
+        except:
+            pass
+        log_channel = 422534466334883850
+        em = discord.Embed(color=discord.Color.dark_purple())
+        em.set_footer().timestamp = datetime.datetime.utcnow()
+        em.add_field(name='Unban',
+                     value=f'**User**: {member} [{member.id}]\n**Staff Member**: {ctx.message.author}')
+        await self.client.get_channel(int(log_channel)).send(embed=em)
+        # await self.punish("UnBan", member, ctx.message.author, reason, 0) -- This is for when I will add the database
 
     #TODO Add checks
 
