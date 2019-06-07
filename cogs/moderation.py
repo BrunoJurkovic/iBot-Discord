@@ -28,7 +28,18 @@ class Moderation(commands.Cog):
         except Exception as e:
             await ctx.channel.send(f'''The user {member} could not be banned. ''')
 
-    #TODO: Add unban
+    @commands.command()
+    async def unban(self, ctx, *, member):
+        banned_list = await ctx.guild.bans()
+        member_name, member_discriminator = member.split('#')
+
+        for i in banned_list:
+            user = i.user
+            if (user.name, user.discriminator) == (member_name, member_discriminator):
+                await ctx.guild.unban(user)
+                await ctx.channel.send(f'''Successfully unbanned @{user.name}#{user.discriminator}!''')
+                return
+
     #TODO Add checks
 
     @commands.command()
