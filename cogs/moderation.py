@@ -5,6 +5,11 @@ import time
 from math import trunc
 from discord.ext import commands
 
+roles_can_kick = ['Admin', 'Mod', 'iApexx']
+roles_can_ban = ['Admin', 'Mod', 'iApexx']
+roles_can_mute = ['Admin', 'Mod', 'iApexx']
+roles_can_clear = ['Admin', 'Mod', 'iApexx']
+
 
 class Moderation(commands.Cog):
 
@@ -12,6 +17,7 @@ class Moderation(commands.Cog):
         self.client = client
 
     @commands.command()
+    @commands.has_any_role(*roles_can_kick)
     async def kick(self, ctx, member: discord.Member, *, reason=None):
 
         if reason == None:
@@ -36,16 +42,16 @@ class Moderation(commands.Cog):
         em = discord.Embed(color=discord.Color.dark_purple())
         em.set_footer().timestamp = datetime.datetime.utcnow()
         em.add_field(name='Kick',
-                     value=f'**User**: {member} [{member.id}]\n**Reason**: {reason}\n**Punisher**: {ctx.message.author}')
+                     value=f'**User**: {member} [{member.id}]\n**Reason**: {reason}\n**Staff Member**: {ctx.message.author}')
         await self.client.get_channel(int(log_channel)).send(embed=em)
         # await self.punish("Kick", member, ctx.message.author, reason, 0) -- This is for when I will add the database
 
     @kick.error
     async def kick_error(self, ctx, error):
         if isinstance(error, commands.MissingAnyRole):
-            await ctx.channel.send(f'''Error, you don't have permission to ban.''')
+            await ctx.channel.send(f'''Error, you don't have permission to kick.''')
         elif isinstance(error, discord.HTTPException):
-            await ctx.channel.send(f'''Error, banning user failed.''')
+            await ctx.channel.send(f'''Error, kicking the user failed.''')
         elif isinstance(error, commands.MissingRequiredArgument):
             await ctx.channel.send(f'''Usage: {ctx.prefix}kick <user> <reason>''')
 
@@ -60,8 +66,9 @@ class Moderation(commands.Cog):
         final_time = time_after - current_time
 
         await ctx.channel.send(f'''Latancy is: `{round(final_time * 1000)}`ms''')
-        
+
     @commands.command()
+    @commands.has_any_role(*roles_can_ban)
     async def ban(self, ctx, member : discord.Member, *, reason=None):
 
         if (reason == None):
@@ -93,6 +100,7 @@ class Moderation(commands.Cog):
             await ctx.channel.send(f'''Usage: {ctx.prefix}ban <user> <reason>.''')
 
     @commands.command()
+    @commands.has_any_role(*roles_can_ban)
     async def unban(self, ctx, *, member, reason=None):
         banned_list = await ctx.guild.bans()
         member_name, member_discriminator = member.split('#')
@@ -126,6 +134,7 @@ class Moderation(commands.Cog):
 
 
     @commands.command()
+    @commands.has_any_role(*roles_can_clear)
     async def clear(self, ctx, limit):
         await ctx.channel.purge(limit=int(limit) + 1)
         await ctx.channel.send(f'''The last {limit} of messages have been cleared successfully!''')
