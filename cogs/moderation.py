@@ -29,6 +29,7 @@ class Moderation(commands.Cog):
                 pass
             await ctx.channel.send(f'''Successfully kicked {member.display_name} for `{reason}`''')
 
+
         await member.kick(reason=reason)
 
         log_channel = 422534466334883850
