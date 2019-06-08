@@ -15,26 +15,15 @@ class Moderation(commands.Cog):
     async def kick(self, ctx, member: discord.Member, *, reason=None):
 
         if reason == None:
-            reason = 'None'
-            message = 'You have been kicked from the server for '
-            if reason != 'None':
-                try:
-                    message += reason
-                    await member.send(message)
-                except:
-                    pass
+            message = 'You have been kicked from the server'
+            await member.send(message)
+            await ctx.channel.send(f'''Successfully kicked `{member.display_name}`''')
+        else:
+            message = 'You have been kicked from the server for ' + reason
+            await member.send(message)
+            await ctx.channel.send(f'''Successfully kicked {member.display_name} for `{reason}`''')
 
-            else:
-                try:
-                    await member.send(message)
-                except:
-                    pass
-        try:
-            await member.kick(reason=reason)
-            await ctx.channel.send(f'''Successfully kicked {member.display_name} for the reason: `{reason}` ''')
-
-        except Exception as e:
-            await ctx.channel.send(f'''The user {member} could not be kicked. ''')
+        await member.kick(reason=reason)
 
         log_channel = 422534466334883850
         em = discord.Embed(color=discord.Color.dark_purple())
@@ -43,6 +32,15 @@ class Moderation(commands.Cog):
                      value=f'**User**: {member} [{member.id}]\n**Reason**: {reason}\n**Punisher**: {ctx.message.author}')
         await self.client.get_channel(int(log_channel)).send(embed=em)
         # await self.punish("Kick", member, ctx.message.author, reason, 0) -- This is for when I will add the database
+
+    @kick.error
+    async def kick_error(self, ctx, error):
+        if isinstance(error, commands.MissingAnyRole):
+            await ctx.channel.send(f'''Error, you don't have permission to ban.''')
+        elif isinstance(error, discord.HTTPException):
+            await ctx.channel.send(f'''Error, banning user failed.''')
+        elif isinstance(error, commands.MissingRequiredArgument):
+            await ctx.channel.send(f'''Usage: {ctx.prefix}kick <user> <reason>''')
  
     @commands.command()
     async def ping(self, ctx): # ik it's bad code
@@ -80,12 +78,12 @@ class Moderation(commands.Cog):
 
     @ban.error
     async def ban_error(self, ctx, error):
-        if isinstance(error, discord.Forbidden):
-            await ctx.channel.send(f'''Error, you don't have permission to ban''')
+        if isinstance(error, commands.MissingAnyRole):
+            await ctx.channel.send(f'''Error, you don't have permission to ban.''')
         elif isinstance(error, discord.HTTPException):
-            await ctx.channel.send(f'''Error, banning user failed''')
-        else:
-            await ctx.channel.send(f'''Error, user is not on the server''')
+            await ctx.channel.send(f'''Error, banning user failed.''')
+        elif isinstance(error, commands.MissingRequiredArgument):
+            await ctx.channel.send(f'''Usage: {ctx.prefix}ban <user> <reason>.''')
 
     @commands.command()
     async def unban(self, ctx, *, member, reason=None):
