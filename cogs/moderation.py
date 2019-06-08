@@ -115,6 +115,16 @@ class Moderation(commands.Cog):
         await self.client.get_channel(int(log_channel)).send(embed=em)
         # await self.punish("UnBan", member, ctx.message.author, reason, 0) -- This is for when I will add the database
 
+    @unban.error
+    async def unban_error(self, ctx, error):
+        if isinstance(error, commands.MissingAnyRole):
+            await ctx.channel.send(f'''Error, you don't have permission to unban.''')
+        elif isinstance(error, discord.HTTPException):
+            await ctx.channel.send(f'''Error, unbanning user failed.''')
+        elif isinstance(error, commands.MissingRequiredArgument):
+            await ctx.channel.send(f'''Usage: {ctx.prefix}unban <user> <reason>.''')
+
+
     @commands.command()
     async def clear(self, ctx, limit):
         await ctx.channel.purge(limit=int(limit) + 1)
