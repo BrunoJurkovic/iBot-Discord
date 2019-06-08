@@ -120,5 +120,11 @@ class Moderation(commands.Cog):
         await ctx.channel.purge(limit=int(limit) + 1)
         await ctx.channel.send(f'''The last {limit} of messages have been cleared successfully!''')
 
+    @clear.error
+    async def clear_error(self, ctx, error):
+        if isinstance(error, commands.MissingAnyRole):
+            await ctx.channel.send("Error, you don't have permission to use clear!")
+
+
 def setup(client):
     client.add_cog(Moderation(client))
