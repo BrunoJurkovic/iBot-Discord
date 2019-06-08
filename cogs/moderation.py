@@ -16,11 +16,17 @@ class Moderation(commands.Cog):
 
         if reason == None:
             message = 'You have been kicked from the server'
-            await member.send(message)
+            try:
+                await member.send(message)
+            except:
+                pass
             await ctx.channel.send(f'''Successfully kicked `{member.display_name}`''')
         else:
             message = 'You have been kicked from the server for ' + reason
-            await member.send(message)
+            try:
+                await member.send(message)
+            except:
+                pass
             await ctx.channel.send(f'''Successfully kicked {member.display_name} for `{reason}`''')
 
         await member.kick(reason=reason)
@@ -41,7 +47,7 @@ class Moderation(commands.Cog):
             await ctx.channel.send(f'''Error, banning user failed.''')
         elif isinstance(error, commands.MissingRequiredArgument):
             await ctx.channel.send(f'''Usage: {ctx.prefix}kick <user> <reason>''')
- 
+
     @commands.command()
     async def ping(self, ctx): # ik it's bad code
         current_time = time.perf_counter()
