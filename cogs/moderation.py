@@ -57,7 +57,7 @@ class Moderation(commands.Cog):
             await ctx.channel.send(f'''Usage: {ctx.prefix}kick <user> <reason>''')
 
     @commands.command()
-    async def ping(self, ctx): # ik it's bad code
+    async def ping(self, ctx):
         current_time = time.perf_counter()
         await ctx.channel.send("")
         time_after = time.perf_counter()
@@ -138,34 +138,39 @@ class Moderation(commands.Cog):
     async def give(self, ctx, member : discord.Member, *, perm):
         role = discord.utils.get(ctx.guild.roles, name=perm)
 
-        if role is None:
-            try:
-                role = await ctx.guild.create_role(name=perm, colour=discord.Color.light_grey())
-                await ctx.send(f'Creating the role {perm}!')
-            except:
-                pass
+        if perm is not 'kick' or 'ban' or 'mute' or 'clear':
+            await ctx.send(f"You haven't specified a valid permission. If you want help use {ctx.prefix}help give.")
 
-        if perm == 'kick':
-            await member.add_roles(role)
-            await ctx.send(f'Giving the user {member.mention} permission to kick!')
+        else:
 
-        elif perm == 'ban':
-            await member.add_roles(role)
-            await ctx.send(f'Giving the user {member.mention} permission to ban!')
+            if role is None:
+                try:
+                    role = await ctx.guild.create_role(name=perm, colour=discord.Color.light_grey())
+                    await ctx.send(f'Creating the role {perm}!')
+                except:
+                    pass
 
-        elif perm == 'mute':
-            await member.add_roles(role)
-            await ctx.send(f'Giving the user {member.mention} permission to mute!')
+            if perm == 'kick':
+                await member.add_roles(role)
+                await ctx.send(f'Giving the user {member.mention} permission to kick!')
 
-        elif perm == 'clear':
-            await member.add_roles(role)
-            await ctx.send(f'Giving the user {member.mention} permission to clear the chat!')
+            elif perm == 'ban':
+                await member.add_roles(role)
+                await ctx.send(f'Giving the user {member.mention} permission to ban!')
 
-        log_channel = 422534466334883850
-        em = discord.Embed(color=discord.Color.dark_purple())
-        em.set_footer().timestamp = datetime.datetime.utcnow()
-        em.add_field(name='Give Permission', value=f'**User**: {member}\n**Responsible**: {ctx.message.author}\n**Permission**: {perm}')
-        await self.client.get_channel(int(log_channel)).send(embed=em)
+            elif perm == 'mute':
+                await member.add_roles(role)
+                await ctx.send(f'Giving the user {member.mention} permission to mute!')
+
+            elif perm == 'clear':
+                await member.add_roles(role)
+                await ctx.send(f'Giving the user {member.mention} permission to clear the chat!')
+
+            log_channel = 422534466334883850
+            em = discord.Embed(color=discord.Color.dark_purple())
+            em.set_footer().timestamp = datetime.datetime.utcnow()
+            em.add_field(name='Give Permission', value=f'**User**: {member}\n**Responsible**: {ctx.message.author}\n**Permission**: {perm}')
+            await self.client.get_channel(int(log_channel)).send(embed=em)
 
     @give.error
     async def give_error(self, ctx, error):
@@ -174,35 +179,37 @@ class Moderation(commands.Cog):
         elif isinstance(error, commands.MissingPermissions):
             await ctx.send(f'''Error, you don't have permission to give permissions.''')
 
-
-
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def revoke(self, ctx, member : discord.Member, *, perm):
         role = discord.utils.get(ctx.guild.roles, name=perm)
 
-        if perm == 'kick':
-            await member.remove_roles(role)
-            await ctx.send(f'Revoking the ability to kick from {member.mention}!')
+        if perm is not 'kick' or 'ban' or 'mute' or 'clear':
+            await ctx.send(f"You haven't specified a valid permission. If you want help use {ctx.prefix}help revoke ")
 
-        elif perm == 'ban':
-            await member.remove_roles(role)
-            await ctx.send(f'Revoking the ability to ban from {member.mention}!')
+        else:
+            if perm == 'kick':
+                await member.remove_roles(role)
+                await ctx.send(f'Revoking the ability to kick from {member.mention}!')
 
-        elif perm == 'mute':
-            await member.remove_roles(role)
-            await ctx.send(f'Revoking the ability to mute from {member.mention}!')
+            elif perm == 'ban':
+                await member.remove_roles(role)
+                await ctx.send(f'Revoking the ability to ban from {member.mention}!')
 
-        elif perm == 'clear':
-            await member.remove_roles(role)
-            await ctx.send(f'Revoking the ability to clear from {member.mention}!')
+            elif perm == 'mute':
+                await member.remove_roles(role)
+                await ctx.send(f'Revoking the ability to mute from {member.mention}!')
 
-        log_channel = 422534466334883850
-        em = discord.Embed(color=discord.Color.dark_purple())
-        em.set_footer().timestamp = datetime.datetime.utcnow()
-        em.add_field(name='Revoke Permission',
-                     value=f'**User**: {member}\n**Responsible**: {ctx.message.author}\n**Permission**: {perm}')
-        await self.client.get_channel(int(log_channel)).send(embed=em)
+            elif perm == 'clear':
+                await member.remove_roles(role)
+                await ctx.send(f'Revoking the ability to clear from {member.mention}!')
+
+            log_channel = 422534466334883850
+            em = discord.Embed(color=discord.Color.dark_purple())
+            em.set_footer().timestamp = datetime.datetime.utcnow()
+            em.add_field(name='Revoke Permission',
+                         value=f'**User**: {member}\n**Responsible**: {ctx.message.author}\n**Permission**: {perm}')
+            await self.client.get_channel(int(log_channel)).send(embed=em)
 
     @revoke.error
     async def give_error(self, ctx, error):
