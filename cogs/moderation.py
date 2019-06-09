@@ -167,6 +167,50 @@ class Moderation(commands.Cog):
         em.add_field(name='Give Permission', value=f'**User**: {member}\n**Responsible**: {ctx.message.author}\n**Permission**: {perm}')
         await self.client.get_channel(int(log_channel)).send(embed=em)
 
+    @give.error
+    async def give_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.channel.send(f'''Usage: {ctx.prefix}give <user> <role>.''')
+        elif isinstance(error, commands.MissingPermissions):
+            await ctx.send(f'''Error, you don't have permission to give permissions.''')
+
+
+
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def revoke(self, ctx, member : discord.Member, *, perm):
+        role = discord.utils.get(ctx.guild.roles, name=perm)
+
+        if perm == 'kick':
+            await member.remove_roles(role)
+            await ctx.send(f'Revoking the ability to kick from {member.mention}!')
+
+        elif perm == 'ban':
+            await member.remove_roles(role)
+            await ctx.send(f'Revoking the ability to ban from {member.mention}!')
+
+        elif perm == 'mute':
+            await member.remove_roles(role)
+            await ctx.send(f'Revoking the ability to mute from {member.mention}!')
+
+        elif perm == 'clear':
+            await member.remove_roles(role)
+            await ctx.send(f'Revoking the ability to clear from {member.mention}!')
+
+        log_channel = 422534466334883850
+        em = discord.Embed(color=discord.Color.dark_purple())
+        em.set_footer().timestamp = datetime.datetime.utcnow()
+        em.add_field(name='Revoke Permission',
+                     value=f'**User**: {member}\n**Responsible**: {ctx.message.author}\n**Permission**: {perm}')
+        await self.client.get_channel(int(log_channel)).send(embed=em)
+
+    @revoke.error
+    async def give_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.channel.send(f'''Usage: {ctx.prefix}revoke <user> <role>.''')
+        elif isinstance(error, commands.MissingPermissions):
+            await ctx.send(f'''Error, you don't have permission to revoke permissions.''')
+
     @commands.command()
     @commands.has_any_role(*roles_can_clear)
     async def clear(self, ctx, limit):
