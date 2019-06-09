@@ -5,7 +5,7 @@ import time
 from math import trunc
 from discord.ext import commands
 
-roles_can_kick = ['Admin', 'Mod', 'iApexx']
+roles_can_kick = ['Admin', 'Mod', 'iApexx', 'Kick']
 roles_can_ban = ['Admin', 'Mod', 'iApexx']
 roles_can_mute = ['Admin', 'Mod', 'iApexx']
 roles_can_clear = ['Admin', 'Mod', 'iApexx']
@@ -15,6 +15,7 @@ class Moderation(commands.Cog):
 
     def __init__(self, client):
         self.client = client
+
 
     @commands.command()
     @commands.has_any_role(*roles_can_kick)
@@ -132,6 +133,39 @@ class Moderation(commands.Cog):
         elif isinstance(error, commands.MissingRequiredArgument):
             await ctx.channel.send(f'''Usage: {ctx.prefix}unban <user> <reason>.''')
 
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def give(self, ctx, member : discord.Member, *, perm):
+        role = discord.utils.get(ctx.guild.roles, name=perm)
+
+        if role is None:
+            try:
+                role = await ctx.guild.create_role(name=perm, colour=discord.Color.light_grey())
+                await ctx.send(f'Creating the role {perm}!')
+            except:
+                pass
+
+        if perm == 'kick':
+            await member.add_roles(role)
+            await ctx.send(f'Giving the user {member.mention} permission to kick!')
+
+        elif perm == 'ban':
+            await member.add_roles(role)
+            await ctx.send(f'Giving the user {member.mention} permission to ban!')
+
+        elif perm == 'mute':
+            await member.add_roles(role)
+            await ctx.send(f'Giving the user {member.mention} permission to mute!')
+
+        elif perm == 'clear':
+            await member.add_roles(role)
+            await ctx.send(f'Giving the user {member.mention} permission to clear the chat!')
+
+        log_channel = 422534466334883850
+        em = discord.Embed(color=discord.Color.dark_purple())
+        em.set_footer().timestamp = datetime.datetime.utcnow()
+        em.add_field(name='Give Permission', value=f'**User**: {member}\n**Responsible**: {ctx.message.author}\n**Permission**: {perm}')
+        await self.client.get_channel(int(log_channel)).send(embed=em)
 
     @commands.command()
     @commands.has_any_role(*roles_can_clear)
