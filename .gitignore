@@ -11,6 +11,7 @@
 .idea/**/shelf
 token
 .idea
+.vscode
 
 # We ignore the users .json aswell
 users.json
