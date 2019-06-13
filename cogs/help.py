@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from disputils import BotEmbedPaginator, BotConfirmation, BotMultipleChoice
+from disputils import BotEmbedPaginator, BotConfirmation, BotMultipleChoice # This is a library that helps us with the listing.
 
 class Help(commands.Cog):
     def __init__(self, client):
@@ -17,7 +17,7 @@ class Help(commands.Cog):
                 
             
         paginator = BotEmbedPaginator(ctx, embeds)
-        await paginator.run()
+        await paginator.run() # This starts the whole paginator process.
 
 
 def setup(client):
