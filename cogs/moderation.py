@@ -215,7 +215,7 @@ class Moderation(commands.Cog):
             await self.client.get_channel(int(log_channel)).send(embed=em)
 
     @revoke.error
-    async def give_error(self, ctx, error):
+    async def revoke_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.channel.send(f'''Usage: {ctx.prefix}revoke <user> <role>.''')
         elif isinstance(error, commands.MissingPermissions):
