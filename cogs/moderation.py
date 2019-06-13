@@ -5,6 +5,7 @@ import time
 from math import trunc
 from discord.ext import commands
 
+# These are some of the variables for the roles that can be used in some commands like kick and etc.
 roles_can_kick = ['Admin', 'Mod', 'iApexx', 'Kick']
 roles_can_ban = ['Admin', 'Mod', 'iApexx']
 roles_can_mute = ['Admin', 'Mod', 'iApexx']
@@ -58,21 +59,22 @@ class Moderation(commands.Cog):
 
     @commands.command()
     async def ping(self, ctx):
+        # The way the ping commands works is that it runs a timer, then sends a dummy message, then starts a new timer,
         current_time = time.perf_counter()
-        await ctx.channel.send("")
+        await ctx.channel.send("") 
         time_after = time.perf_counter()
 
         await ctx.channel.purge(limit=1)
 
-        final_time = time_after - current_time
+        final_time = time_after - current_time # Then it subtracts the before time from the time after the message,
 
-        await ctx.channel.send(f'''Latancy is: `{round(final_time * 1000)}`ms''')
+        await ctx.channel.send(f'''Latancy is: `{round(final_time * 1000)}`ms''') # Then it rounds the number here.
 
     @commands.command()
     @commands.has_any_role(*roles_can_ban)
     async def ban(self, ctx, member : discord.Member, *, reason=None):
 
-        if (reason == None):
+        if (reason == None): # We do this so that there is a different message sent to the user when a staff member has and has not specified a reason.
             await ctx.channel.send(f'''Successfully banned {member.display_name}''')
             message = f'''You have been banned from the server {member.guild.name}'''
             await member.send(message)
@@ -83,7 +85,7 @@ class Moderation(commands.Cog):
             await member.send(message)
             await member.ban(reason=reason)
 
-        log_channel = 422534466334883850
+        log_channel = 422534466334883850 # This specifies the channel id where the log message will be sent TODO: Make it a variable!
         em = discord.Embed(color=discord.Color.dark_purple())
         em.set_footer().timestamp = datetime.datetime.utcnow()
         em.add_field(name='Ban',
@@ -106,15 +108,16 @@ class Moderation(commands.Cog):
         banned_list = await ctx.guild.bans()
         member_name, member_discriminator = member.split('#')
         author = ctx.message.author
+        # Runs a for loop where it loops through every member in the banned user list.
         for i in banned_list:
             user = i.user
-            if (user.name, user.discriminator) == (member_name, member_discriminator):
+            if (user.name, user.discriminator) == (member_name, member_discriminator): # If the member matches the user in the ban list, it will unban him.
                 await ctx.guild.unban(user)
                 await ctx.channel.send(f'''Successfully unbanned @{user.name}#{user.discriminator}!''')
                 return
 
         try:
-            await ctx.member.send(f'''You have been unbanned from the server!''')
+            await ctx.member.send(f'''You have been unbanned from the server!''') # Messages like these have to be in "try" since if it fails, it throws an error
         except:
             pass
         log_channel = 422534466334883850
@@ -136,14 +139,14 @@ class Moderation(commands.Cog):
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def give(self, ctx, member : discord.Member, *, perm):
-        role = discord.utils.get(ctx.guild.roles, name=perm)
+        role = discord.utils.get(ctx.guild.roles, name=perm) # This checks if the role the user specified exists.
 
-        if perm is not 'kick' or 'ban' or 'mute' or 'clear':
+        if perm is not 'kick' or 'ban' or 'mute' or 'clear': # This is just a safe guard so that users cannot give and make roles that are not meant to be made/given.
             await ctx.send(f"You haven't specified a valid permission. If you want help use {ctx.prefix}help give.")
 
         else:
 
-            if role is None:
+            if role is None: # If a role does not exist, then it will create it.
                 try:
                     role = await ctx.guild.create_role(name=perm, colour=discord.Color.light_grey())
                     await ctx.send(f'Creating the role {perm}!')
