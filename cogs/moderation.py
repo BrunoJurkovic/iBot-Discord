@@ -18,6 +18,14 @@ class Moderation(commands.Cog):
     def __init__(self, client):
         self.client = client
 
+    def isWarnKicked(self, user):
+        current_warn_count = user['warn_count']
+
+        if current_warn_count >= 3:
+            return True
+
+        else:
+            return False
 
     @commands.command()
     @commands.has_any_role(*roles_can_kick)
@@ -48,6 +56,29 @@ class Moderation(commands.Cog):
                      value=f'**User**: {member} [{member.id}]\n**Reason**: {reason}\n**Staff Member**: {ctx.message.author}')
         await self.client.get_channel(int(log_channel)).send(embed=em)
         # await self.punish("Kick", member, ctx.message.author, reason, 0) -- This is for when I will add the database
+
+    @commands.command()
+    async def warn(self, ctx, member : discord.Member, reason = None):
+
+        guild_id = str(ctx.guild.id)
+        member_id = str(member.id)
+        user = await self.client.pg_pool.fetch("SELECT * FROM users WHERE user_id = $1 AND guild_id = $2", member_id, guild_id)
+
+        if not user:
+            await self.client.pg_pool.execute("INSERT INTO users (user_id, guild_id, ban_time, warn_count) VALUES ($1, $2, 0, 0)", member_id, guild_id)
+
+        user = await self.client.pg_pool.fetchrow("SELECT * FROM users WHERE user_id = $1 AND guild_id = $2", member_id, guild_id)
+        await self.client.pg_pool.execute("UPDATE users SET warn_count = $1 WHERE user_id = $2 AND guild_id = $3", user['warn_count'] + 1, member_id, guild_id)
+        if reason is not None:
+            await ctx.send(f'The user {member} has been warned for {reason}!')
+
+        else:
+            await ctx.send(f'The user {member} has been warned!')
+
+        if self.isWarnKicked(user):
+            await ctx.send(f'The user {member} has been banned because he has reached 3 warnings!')
+            await member.ban(reason='The user has been warned three times!')
+
 
     @kick.error
     async def kick_error(self, ctx, error):

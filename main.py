@@ -12,11 +12,14 @@ client = commands.Bot(command_prefix=".")
 with open('dbinfo.json', 'r') as f:
     dbinfo = json.load(f)
 
+
 async def create_db_connection():
     client.pg_connect = await asyncpg.connect(user=dbinfo['username'], password=dbinfo['password'], host=dbinfo['server'], port=dbinfo['port'], database=dbinfo['database'])
 
+
 async def create_db_pool():
-    client.pg_pool = await asyncpg.create_pool(database=dbinfo['database'], user=dbinfo['username'], password=dbinfo['password'])
+    client.pg_pool = await asyncpg.create_pool(dsn='postgres://discord:fXy8wUxSQBcNne4W@134.209.26.253:5432/discord')
+
 
 # This is the part of the code which reads the users token from a file names token.
 def read_file():
@@ -45,6 +48,7 @@ async def unload(ctx, extension):
     except Exception as e:
         await ctx.channel.send(f'''Error! We could not unload the extension {extension} because {e}''')
 
+
 @client.command()
 async def reload(ctx, extension):
     if extension == 'all':
@@ -71,5 +75,6 @@ for file in os.listdir('./cogs'):
 
 
 client.loop.run_until_complete(create_db_connection())
+client.loop.run_until_complete(create_db_pool())
 private_token = read_file()
 client.run(private_token) # This starts the bot
