@@ -12,7 +12,6 @@ class Events(commands.Cog):
     async def on_message_edit(self, before, after):
 
 
-
         em = discord.Embed(description=f"**Message edited in {before.channel.mention}**",
                            colour=discord.Colour.dark_purple())
         em.set_author(name=before.author, icon_url=before.author.avatar_url)
@@ -29,6 +28,10 @@ class Events(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message_delete(self, message):
+
+        if message.author == self.client.user:
+            return
+
         attachments = '\r'
         if message.attachments != [] or message.embeds != []:
             for j in message.attachments:

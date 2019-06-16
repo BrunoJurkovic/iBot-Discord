@@ -79,6 +79,13 @@ class Moderation(commands.Cog):
             await ctx.send(f'The user {member} has been banned because he has reached 3 warnings!')
             await member.ban(reason='The user has been warned three times!')
 
+        log_channel = 422534466334883850
+        em = discord.Embed(color=discord.Color.dark_purple())
+        em.set_footer().timestamp = datetime.datetime.utcnow()
+        em.add_field(name='Warn', value=f'**User**: {member}\n**Reason**: {reason}\n**Responsible**: {ctx.message.author}')
+        await self.client.get_channel(int(log_channel)).send(embed=em)
+        # await self.punish("UnBan", member, ctx.message.author, reason, 0) -- This is for when I will add the database
+
 
     @kick.error
     async def kick_error(self, ctx, error):
