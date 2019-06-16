@@ -4,16 +4,27 @@ import time
 import asyncio
 import os
 from discord.ext import commands
+import asyncpg
+import json
 
 client = commands.Bot(command_prefix=".")
 
-logging_channel = ''
+with open('dbinfo.json', 'r') as f:
+    dbinfo = json.load(f)
+
+async def create_db_connection():
+    client.pg_connect = await asyncpg.connect(user=dbinfo['username'], password=dbinfo['password'], host=dbinfo['server'], port=dbinfo['port'], database=dbinfo['database'])
+
+async def create_db_pool():
+    client.pg_pool = await asyncpg.create_pool(database=dbinfo['database'], user=dbinfo['username'], password=dbinfo['password'])
+
 # This is the part of the code which reads the users token from a file names token.
 def read_file():
-    with open('token') as f:
+    with open('token.txt') as f:
         variable = f.read()
 
     return variable
+
 
 #This will load the desired cogs
 @client.command()
@@ -58,5 +69,7 @@ for file in os.listdir('./cogs'):
     if file.endswith('.py'):
         client.load_extension(f"""cogs.{file[:-3]}""") # this removes the .py extension from the filename
 
+
+client.loop.run_until_complete(create_db_connection())
 private_token = read_file()
 client.run(private_token) # This starts the bot

@@ -4,6 +4,7 @@ import datetime
 import time
 from math import trunc
 from discord.ext import commands
+import asyncpg
 
 # These are some of the variables for the roles that can be used in some commands like kick and etc.
 roles_can_kick = ['Admin', 'Mod', 'iApexx', 'Kick']

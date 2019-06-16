@@ -1,0 +1,7 @@
+{
+    "server": "134.209.26.253",
+    "port": "5432",
+    "database": "discord",
+    "username": "discord",
+    "password": "test"  
+  }
