@@ -27,6 +27,7 @@ class Moderation(commands.Cog):
         else:
             return False
 
+
     @commands.command()
     @commands.has_any_role(*roles_can_kick)
     async def kick(self, ctx, member: discord.Member, *, reason=None):
@@ -65,7 +66,8 @@ class Moderation(commands.Cog):
         user = await self.client.pg_pool.fetch("SELECT * FROM users WHERE user_id = $1 AND guild_id = $2", member_id, guild_id)
 
         if not user:
-            await self.client.pg_pool.execute("INSERT INTO users (user_id, guild_id, ban_time, warn_count) VALUES ($1, $2, 0, 0)", member_id, guild_id)
+            await self.client.pg_pool.execute(
+                "INSERT INTO users (user_id, guild_id, tempban_time, warn_count) VALUES ($1, $2, 0, 0)", member_id, guild_id)
 
         user = await self.client.pg_pool.fetchrow("SELECT * FROM users WHERE user_id = $1 AND guild_id = $2", member_id, guild_id)
         await self.client.pg_pool.execute("UPDATE users SET warn_count = $1 WHERE user_id = $2 AND guild_id = $3", user['warn_count'] + 1, member_id, guild_id)
@@ -270,6 +272,46 @@ class Moderation(commands.Cog):
     async def clear_error(self, ctx, error):
         if isinstance(error, commands.MissingAnyRole):
             await ctx.channel.send("Error, you don't have permission to use clear!")
+
+    @commands.command()
+    async def prefix(self, ctx, prefix):
+        guild_id = ctx.guild.id
+        guild = await self.client.pg_pool.fetch("SELECT * FROM guilds WHERE guild_id = $1", guild_id)
+
+        if not guild:
+            await self.client.pg_pool.execute("INSERT INTO guilds (guild_id, prefix)  VALUES ($1, $2)", guild_id, '.')
+
+        await self.client.pg_pool.execute("UPDATE guilds SET prefix = $1 WHERE guild_id = $2", str(prefix), guild_id)
+
+    @commands.command()
+    async def tempban(self, ctx, member : discord.Member, *, time=None, reason=None):
+
+        guild_id = str(ctx.guild.id)
+        member_id = str(member.id)
+        user = await self.client.pg_pool.fetch("SELECT * FROM users WHERE user_id = $1 AND guild_id = $2", member_id, guild_id)
+
+        if not user:
+            await self.client.pg_pool.execute(
+                "INSERT INTO users (user_id, guild_id, tempban_time, warn_count) VALUES ($1, $2, 0, 0)", member_id,
+                guild_id)
+
+        user = await self.client.pg_pool.fetchrow("SELECT * FROM users WHERE user_id = $1 AND guild_id = $2", member_id, guild_id)
+
+        await self.client.pg_pool.execute("UPDATE users SET tempban_time = $1 WHERE user_id = $2 AND guild_id = $3", int(time), member_id, guild_id)
+
+        if reason is not None:
+            await ctx.send(f'The user {member} has been banned for {time} for {reason}!')
+
+        else:
+            await ctx.send(f'The user {member} has been banned for {time}!')
+
+
+        log_channel = 422534466334883850
+        em = discord.Embed(color=discord.Color.dark_purple())
+        em.set_footer().timestamp = datetime.datetime.utcnow()
+        em.add_field(name='TempBan', value=f'**User**: {member}\n**Reason**: {reason}\n**Responsible**: {ctx.message.author}\n **Time**: {time}')
+        await self.client.get_channel(int(log_channel)).send(embed=em)
+
 
 
 def setup(client):

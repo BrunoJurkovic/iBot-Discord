@@ -7,19 +7,21 @@ from discord.ext import commands
 import asyncpg
 import json
 
-client = commands.Bot(command_prefix=".")
+
+async def create_db_pool():
+    client.pg_pool = await asyncpg.create_pool(dsn=f'postgres://{dbinfo["username"]}:{dbinfo["password"]}@{dbinfo["server"]}:{dbinfo["port"]}/{dbinfo["database"]}')
+
+#
+#async def getPrefix(bot, message):
+#    guild = await client.pg_pool.fetch("SELECT * FROM guilds WHERE guild_id = $1", message.guild.id)
+#    print(guild)
+#    return guild[0]
+#
+#This is for when I will implement caching, so that I don't have to call the database on every message!
+client = commands.Bot(command_prefix='.')
 
 with open('dbinfo.json', 'r') as f:
     dbinfo = json.load(f)
-
-
-async def create_db_connection():
-    client.pg_connect = await asyncpg.connect(user=dbinfo['username'], password=dbinfo['password'], host=dbinfo['server'], port=dbinfo['port'], database=dbinfo['database'])
-
-
-async def create_db_pool():
-    client.pg_pool = await asyncpg.create_pool(dsn='postgres://discord:fXy8wUxSQBcNne4W@134.209.26.253:5432/discord')
-
 
 # This is the part of the code which reads the users token from a file names token.
 def read_file():
@@ -74,7 +76,6 @@ for file in os.listdir('./cogs'):
         client.load_extension(f"""cogs.{file[:-3]}""") # this removes the .py extension from the filename
 
 
-client.loop.run_until_complete(create_db_connection())
 client.loop.run_until_complete(create_db_pool())
 private_token = read_file()
 client.run(private_token) # This starts the bot
